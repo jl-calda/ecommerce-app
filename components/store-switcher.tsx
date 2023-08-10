@@ -1,10 +1,10 @@
 "use client";
 
-import Icons from "@/components/Icons";
 import React, { useState } from "react";
 import { Store } from "@prisma/client";
-import { useStoreModal } from "@/hooks/use-store-modal";
 
+import { useStoreModal } from "@/hooks/use-store-modal";
+import Icons from "@/components/Icons";
 import {
   Popover,
   PopoverContent,
