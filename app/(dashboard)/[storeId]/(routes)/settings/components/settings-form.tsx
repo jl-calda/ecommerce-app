@@ -1,10 +1,13 @@
 "use client";
 
 import * as z from "zod";
+import { useParams, useRouter } from "next/navigation";
 import Icons from "@/components/Icons";
 import { Store } from "@prisma/client";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 import Heading from "@/components/heading";
 import { Button } from "@/components/ui/button";
@@ -19,6 +22,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import AlertModal from "@/components/alert-modal";
+import { ApiAlert } from "@/components/ui/api-alert";
+import { useOrigin } from "@/hooks/use-origin";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -31,6 +37,9 @@ interface SettingsFormProps {
 }
 
 const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
+  const params = useParams();
+  const router = useRouter();
+  const origin = useOrigin();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -39,12 +48,41 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     defaultValues: initialData,
   });
 
-  const onSubmit = async (values: SettingsFormValues) => {
-    console.log(values);
+  const onSubmit = async (data: SettingsFormValues) => {
+    try {
+      setLoading(true);
+      await axios.patch(`/api/stores/${params.storeId}`, data);
+      router.refresh();
+      toast.success("Store updated");
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onDelete = async () => {
+    try {
+      setLoading(true);
+      axios.delete(`/api/stores/${params.storeId}`);
+      router.refresh();
+      router.push("/");
+      toast.success("Store deleted");
+    } catch (error) {
+      toast.error("Make sure you don't have any products and categories");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
+      <AlertModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+      />
       <div className="flex items-center justify-between">
         <Heading
           title="Settings"
@@ -58,7 +96,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           }}
           variant="destructive"
         >
-          <Icons.trash />
+          <Icons.Trash />
         </Button>
       </div>
       <Separator />
@@ -95,6 +133,12 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
+      <Separator />
+      <ApiAlert
+        title="NEXT_PUBLIC_API_URL"
+        description={`${origin}/api/${params.storeId}`}
+        variant="public"
+      />
     </>
   );
 };
