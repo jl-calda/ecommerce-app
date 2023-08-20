@@ -1,4 +1,5 @@
 import {
+  CheckCircle,
   Copy,
   Edit,
   ImagePlus,
@@ -7,6 +8,7 @@ import {
   Server,
   Store,
   Trash,
+  XCircle,
 } from "lucide-react";
 import { ChevronsUpDownIcon } from "lucide-react";
 import { Check } from "lucide-react";
@@ -24,6 +26,8 @@ const Icons = {
   ImagePlus: ImagePlus,
   MoreHorizontal: MoreHorizontal,
   Edit: Edit,
+  CheckCircle: CheckCircle,
+  XCircle: XCircle,
 };
 
 export default Icons;
